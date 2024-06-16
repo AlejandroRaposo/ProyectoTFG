@@ -22,4 +22,6 @@ public function listas()
 {
     return $this->belongsTo(Lista::class, 'lista_idlista', 'idlista');
 }
+
+public $timestamps = false;
 }

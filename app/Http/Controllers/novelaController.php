@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Novela;
+use App\Models\Review;
 use App\models\User;
 use App\models\Genero;
 use App\models\Capitulo;
@@ -143,9 +144,10 @@ class novelaController extends Controller
         $capitulos = capitulo::where('novela_idnovela',$novela->idnovela)->orderBy('fecha_creacion','desc')->paginate(10);
         $generos = genero::whereIn('idgenero',novela_has_genero::where('novela_idnovela',$novela->idnovela)->pluck('genero_idgenero'))->get();
 
+        $reviews = review::where('novela_idnovela',$id)->paginate(10);
         
         
-       return view('novelas.show', compact('novela','usuarios','puntuacion','capitulos','generos','listas'));
+       return view('novelas.show', compact('novela','usuarios','puntuacion','capitulos','generos','listas','reviews'));
     }
 
     public function lector(string $idnovela, string $idcapitulo) {
@@ -185,7 +187,7 @@ class novelaController extends Controller
             'nombre'=> 'required|max:200|min:5',
             'descripcion'=> 'required|max:200|min:2',
             'categoria' => 'required|max:200|min:2',
-            'edad_minima' => 'required|min:1|max:120',
+            'edad_minima' => 'min:0|max:120',
         ]);
         
         // Cargamos la novela a modificar
@@ -328,6 +330,8 @@ class novelaController extends Controller
 
     public function valorar(){
 
+      
+
         valoracion::insert([
             'novela_idnovela' => $_POST['idnovela']  ,
             'usuario_idusuario' => $_POST['idusuario'] ,
@@ -336,35 +340,122 @@ class novelaController extends Controller
            
         ]);
 
-        return redirect()->route('novela.show', $_POST('idnovela'));
+        return redirect()->route('novela.show', $_POST['idnovela']);
 
     }
 
     public function cambiarValoracion(){
 
-        valoracion::upsert([
-            'novela_idnovela' => $_POST['idnovela']  ,
-            'usuario_idusuario' => $_POST['idusuario'] ,
-            'puntuacion' => $_POST['Val']  ,
+        $valoracion = valoracion::where('usuario_idusuario','=',$_POST['idusuario'])->where('novela_idnovela','=',$_POST['idnovela'])->update(['puntuacion' => $_POST['Val']]);
+        
 
-           
-        ]);
-
-        return redirect()->route('novela.show', $_POST('idnovela'));
+        return redirect()->route('novela.show', $_POST['idnovela']);
 
     }
 
     public function addfavorito(){
 
         lista_has_novela::insert([
-            'novela_idnovela' => $_POST['idnovela']  ,
-            'lista_idlista' => $_POST['idlista'] ,
+            'novela_idnovela' => $_POST['idnovelaFav']  ,
+            'lista_idlista' => $_POST['idlistaFav'] ,
             
            
         ]);
 
+        return redirect()->route('novela.show', $_POST['idnovelaFav']);
+
+    }
+
+    public function borrarFavorito(){
+
+        $favorito = Lista_has_novela::where('lista_idlista','=',$_POST['idlistaFav'])->where('novela_idnovela','=',$_POST['idnovelaFav'])->delete();
+        
+
+        return redirect()->route('novela.show', $_POST['idnovelaFav']);
+
+    }
+
+
+    public function enviarReview(){
+
+        if (isset($_POST['ValEnv'])) {
+            valoracion::insert([
+                'novela_idnovela' => $_POST['idnovela']  ,
+                'usuario_idusuario' => $_POST['idusuario'] ,
+                'puntuacion' => $_POST['ValEnv']  ,
+            ]);
+        }
+
+        $Punt = valoracion::where('usuario_idusuario','=',$_POST['idusuario'])->where('novela_idnovela','=',$_POST['idnovela'])->get()[0];
+
+        review::insert([
+            'usuario_nombre_usuario' => $_POST['usuario_nombre_usuario'],
+            'novela_idnovela' => $_POST['idnovela'],
+            'review' => $_POST['review'],
+            'idvaloracion' => $Punt->idvaloracion,
+            'fecha' => date("Y-m-d"),
+        ]);
+
+
+
+        return redirect()->route('novela.show', $_POST['idnovela']);
+    }
+
+    public function editarReview(){
+
+        review::where('usuario_nombre_usuario',$_POST['usuario_nombre_usuario'])->where('novela_idnovela',$_POST['idnovela'])->update(['review' => $_POST['review'],'fecha'=>date("Y-m-d")]);
+
+
+        return redirect()->route('novela.show', $_POST['idnovela']);
+    }
+
+
+    public function borrarReview(){
+
+        $favorito = review::where('usuario_nombre_usuario',$_POST['usuario_nombre_usuario'])->where('novela_idnovela',$_POST['idnovela'])->delete();
+        
+
         return redirect()->route('novela.show', $_POST['idnovela']);
 
+    }
+
+    public function showFavoritos(){
+
+          
+        if (gate::allows('comprobar-edad', Auth::user())){
+           $novelas_cap = novela::join('capitulos','novelas.idnovela', '=' ,'capitulos.novela_idnovela')->join('novela_has_generos','novelas.idnovela','=','novela_has_generos.novela_idnovela')->join('generos','novela_has_generos.genero_idgenero','=','generos.idgenero')->select('nombre_novela','idnovela','edad_min','created_at','fecha_creacion','estado','idcapitulo','nombre_capitulo','link_capitulo','nombre_genero')->orderBy('fecha_creacion', 'desc')->get();
+            
+        }
+
+        if (! gate::allows('comprobar-edad',Auth::user())){
+            $novelas_cap = novela::join('capitulos','novelas.idnovela', '=' ,'capitulos.novela_idnovela')->join('novela_has_generos','novelas.idnovela','=','novela_has_generos.novela_idnovela')->join('generos','novela_has_generos.genero_idgenero','=','generos.idgenero')->select('nombre_novela','idnovela','edad_min','created_at','fecha_creacion','estado','idcapitulo','nombre_capitulo','link_capitulo','nombre_genero')->orderBy('fecha_creacion', 'desc')->whereNull('edad_min')->get();
+           
+        }
+        $capitulos = capitulo::select('*');
+
+        $favoritos = lista::where('lista_idlista',Auth::user()->id)->paginate(10);
+
+        return view('profile.favoritos',compact('novelas_cap','favoritos','capitulos'));
+    }
+
+    public function misNovelas(){
+
+          
+        if (gate::allows('comprobar-edad', Auth::user())){
+           $novelas_cap = novela::join('capitulos','novelas.idnovela', '=' ,'capitulos.novela_idnovela')->join('novela_has_generos','novelas.idnovela','=','novela_has_generos.novela_idnovela')->join('generos','novela_has_generos.genero_idgenero','=','generos.idgenero')->select('nombre_novela','idnovela','edad_min','created_at','fecha_creacion','estado','idcapitulo','nombre_capitulo','link_capitulo','nombre_genero')->orderBy('fecha_creacion', 'desc')->get();
+            
+        }
+
+        if (! gate::allows('comprobar-edad',Auth::user())){
+            $novelas_cap = novela::join('capitulos','novelas.idnovela', '=' ,'capitulos.novela_idnovela')->join('novela_has_generos','novelas.idnovela','=','novela_has_generos.novela_idnovela')->join('generos','novela_has_generos.genero_idgenero','=','generos.idgenero')->select('nombre_novela','idnovela','edad_min','created_at','fecha_creacion','estado','idcapitulo','nombre_capitulo','link_capitulo','nombre_genero')->orderBy('fecha_creacion', 'desc')->whereNull('edad_min')->get();
+           
+        }
+
+        $capitulos = capitulo::select('*');
+
+        $novelasAutor = novela::where('usuario_idusuario',Auth::user()->id)->paginate(10);
+
+        return view('profile.novelas',compact('novelas_cap','novelasAutor','capitulos'));
     }
 
 }

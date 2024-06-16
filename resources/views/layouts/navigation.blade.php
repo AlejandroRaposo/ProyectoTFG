@@ -65,11 +65,11 @@
                             {{ __('Mi perfil') }}
                         </x-dropdown-link>
 
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.novelas', Auth::user()->id)">
                             {{ __('Mis novelas') }}
                         </x-dropdown-link>
 
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.favoritos', Auth::user()->id)">
                             {{ __('Mis favoritos') }}
                         </x-dropdown-link>
 
@@ -143,11 +143,11 @@
                     {{ __('Perfil') }}
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <x-responsive-nav-link :href="route('profile.novelas', Auth::user()->id)">
                     {{ __('Mis novelas') }}
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <x-responsive-nav-link :href="route('profile.favoritos', Auth::user()->id)">
                     {{ __('Mis favoritos') }}
                 </x-responsive-nav-link>
 

@@ -25,14 +25,25 @@ Route::get('/novela/{id}', novelaController::class . '@show')->name('novela.show
 
 Route::delete('/novelas/{id}', novelaController::class . '@destroy')->middleware(['auth', 'verified'])->name('novela.destroy');
 
+// Valoraciones
+
 Route::post('/novelas/{id}/valorar', novelaController::class . '@valorar')->middleware(['auth', 'verified'])->name('novela.valorar');
 
 Route::patch('/novelas/{id}/valorar', novelaController::class . '@cambiarValoracion')->middleware(['auth', 'verified'])->name('novela.cambiar-valoracion');
 
+// Favorito
+
 Route::post('/novelas/{id}/favorito', novelaController::class . '@addfavorito')->middleware(['auth', 'verified'])->name('novela.add-favorito');
 
-Route::patch('/novelas/{id}/favorito', novelaController::class . '@cambiarValoracion')->middleware(['auth', 'verified'])->name('novela.cambiar-favorito');
+Route::delete('/novelas/{id}/favorito', novelaController::class . '@borrarFavorito')->middleware(['auth', 'verified'])->name('novela.borrar-favorito');
 
+// Reviews
+
+Route::post('/novelas/{id}/review', novelaController::class . '@enviarReview')->middleware(['auth', 'verified'])->name('review.enviar');
+
+Route::patch('/novelas/{id}/review', novelaController::class . '@editarReview')->middleware(['auth', 'verified'])->name('review.editar');
+
+Route::delete('/novelas/{id}/review', novelaController::class . '@borrarReview')->middleware(['auth', 'verified'])->name('review.borrar');
 
 
 // Capitulos
@@ -62,6 +73,11 @@ Route::patch('/usuario/{id}', mensajeController::class . '@editarMensaje')->midd
 // Usuarios
 
 Route::get('/usuario/{id}', ProfileController::class . '@mostrarUsuario')->name('profile.show') ;
+
+Route::get('/usuario/{id}/favoritos', novelaController::class . '@showFavoritos')->middleware(['auth', 'verified'])->name('profile.favoritos') ;
+
+Route::get('/usuario/{id}/novelas', novelaController::class . '@misNovelas')->middleware(['auth', 'verified'])->name('profile.novelas') ;
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

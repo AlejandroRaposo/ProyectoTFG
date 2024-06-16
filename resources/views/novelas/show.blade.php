@@ -73,41 +73,37 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
 
                     @auth
 
+                    <div class="row g-0">
+                    @if (in_array(Auth::user()->id, $puntuacion->pluck('usuario_idusuario')->all()))
 
-                    <script>
-                        
+                    <form action="{{ route('novela.cambiar-valoracion' , $novela->idnovela )}}" id="valor" name="valor" method="post">
+                    @csrf
+                    @method('patch')
+                    <select class="form-select form-select-sm" id="Val" name="Val" onchange="this.form.submit()">
+                      <option selected disabled id="val-form">Cambia tu voto</option>
+                      <option id="Val1" name="Val1" value="1">1</option>
+                      <option id="Val2" name="Val2" value="2">2</option>
+                      <option id="Val3" name="Val3" value="3">3</option>
+                      <option id="Val4" name="Val4" value="4">4</option>
+                      <option id="Val5" name="Val5" value="5">5</option>
+                      <option id="Val6" name="Val6" value="6">6</option>
+                      <option id="Val7" name="Val7" value="7">7</option>
+                      <option id="Val8" name="Val8" value="8">8</option>
+                      <option id="Val9" name="Val9" value="9">9</option>
+                      <option id="Val10" name="Val10" value="10">10</option>
+
+                    </select>
+
                     
-                    function cambiarVoto() {
-                      document.getElementById('val-form').innerText = 'Cambia tu voto';
-                      document.getElementsByName('_method')[document.getElementsByName('_method').length - 2].value = "patch";
-                    }
-
-                    function quitarFav() {
-                      document.getElementsByName('_method')[document.getElementsByName('_method').length - 1].value = "patch";
-                    }
-
-                    
-                  </script>
-
-                    
-                    @if (in_array(Auth::user()->id, $listas->pluck('idlista')->all()))
-                    <script>onload="cambiarVoto()"</script>
-
-                  KLOO
-                    @endif
+                    <input type="hidden" name="idusuario" value="{{ Auth::user()->id }}">
+                      <input type="hidden" name="idnovela" value="{{ $novela->idnovela }}">
 
 
-                    @if (in_array(Auth::user()->id, $listas->pluck('usuario_idusuario')->all()))
-                
-                    <script>
-                      document.getElementById('val-form').innerText = 'Cambia tu voto';
-                    </script>
-                      
-                    @endif
+                  </form>
 
+                  @else
 
-                  <div class="row g-0">
-                  <form action="{{ route('novela.valorar' , $novela->idnovela )}}" name="valor" method="post">
+                  <form action="{{ route('novela.valorar' , $novela->idnovela )}}" id="valor2" name="valor" method="post">
                     @csrf
                     @method('post')
                     <select class="form-select form-select-sm" id="Val" name="Val" onchange="this.form.submit()">
@@ -131,19 +127,36 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
                   </form>
 
 
+                    @endif
+
+                   
+                     
+
+                    @if (in_array(Auth::user()->id, $listas->pluck('idlista')->all()))
+
+                    <form action="{{ route('novela.borrar-favorito' , $novela->idnovela )}}" name="favorito" method="post">
+                    @csrf
+                    @method('delete')
+                    <input type="hidden" name="idnovelaFav" value="{{ $novela->idnovela }}">
+                    <input type="hidden" name="idlistaFav" value="{{ Auth::user()->id }}">
+                    <button name="borrarFavo" id="fav-borrar"  type="submit"><img src="{{ asset('storage/assets/heart-solid.svg')}}" class="img-fluid rounded-circle" style="min-width:50px;min-height:50px;max-height: 90px;max-width: 90px; padding:10px" alt="..."></button>
+                  </form>
+
+                  @else
+      
+                  
+            
                   <form action="{{ route('novela.add-favorito' , $novela->idnovela )}}" name="favorito" method="post">
                     @csrf
                     @method('post')
                     <input type="hidden" name="idnovelaFav" value="{{ $novela->idnovela }}">
-                    
-                    <a onclick="this.form.submit()"><img src="{{ asset('storage/assets/heart-regular.svg')}}" class="img-fluid rounded-start" style="max-width: 50px;max-width: 50px; padding:10px" alt="...">
                     <input type="hidden" name="idlistaFav" value="{{ Auth::user()->id }}">
-                    <input type="hidden" name="idnovela" value="{{ $novela->idnovela }}">
-                    </a>
-                    
+                    <button type="submit"><img id="fav-add" src="{{ asset('storage/assets/heart-regular.svg')}}" class="img-fluid rounded-start" style="min-width:50px;min-height:50px;max-height: 90px;max-width: 90px; padding:10px" alt="..."></button>
+                   
                    
 
                   </form>
+                  @endif
                   </div>
                   @endauth
               </div>
@@ -225,14 +238,86 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
     </div>
 
 
+    <div class="container mt-5 border round" style="padding: 10px;">
+      
+      @if (isset($reviews))
+      <table class="table">
+      @foreach ($reviews as $review)
+              @include('layouts.review')
+            @endforeach
+            
+           
+      </table>
+      {{ $reviews->links() }}
+      @endif
+    
+      @auth
 
+      @if (! in_array(Auth::user()->name, $reviews->pluck('usuario_nombre_usuario')->all()))
+      <div class="border rounded" style="padding: 10px;">
+        <h2><strong>Enviar review:</strong></h2>
+      <form action="{{ route('review.enviar'  , $novela->idnovela)}}" method="post" name="enviar" id='reviewEnviar'>
+      @csrf
+      @method('post')
+
+      <div class="border rounded" style="padding: 10px;"><div id="Autor">{{Auth::user()->name}}</div>
+          <div class="row container" style="margin: 10px;">
+          @if (! in_array(Auth::user()->id, $puntuacion->pluck('usuario_idusuario')->all()))
+
+          <select class="form-select form-select-sm" id="ValEnv" name="ValEnv">
+                      <option selected disabled id="val-form">Debes votar</option>
+                      <option id="Val1" name="Val1" value="1">1</option>
+                      <option id="Val2" name="Val2" value="2">2</option>
+                      <option id="Val3" name="Val3" value="3">3</option>
+                      <option id="Val4" name="Val4" value="4">4</option>
+                      <option id="Val5" name="Val5" value="5">5</option>
+                      <option id="Val6" name="Val6" value="6">6</option>
+                      <option id="Val7" name="Val7" value="7">7</option>
+                      <option id="Val8" name="Val8" value="8">8</option>
+                      <option id="Val9" name="Val9" value="9">9</option>
+                      <option id="Val10" name="Val10" value="10">10</option>
+          </select>
+          @endif
+          <input type="hidden" name="idusuario" value="{{Auth::user()->id}}">
+          <input type="hidden" name="usuario_nombre_usuario" value="{{Auth::user()->name}}">
+          <input type="hidden" name="idnovela" value="{{$novela->idnovela}}">
+            <textarea name="review" id="area_mensaje" rows="10"></textarea>
+            </div>
+            <div  style="margin: 20px;">
+            <button class="btn btn-primary " id="botonEnviar"  type="submit">Enviar review</button>
+           </form>
+    
+      </div>
+      </div>
+             @else
+      <div class="border rounded" style="padding: 10px;">
+        <h2><strong>Editar review:</strong></h2>
+      <form action="{{ route('review.editar'  , $novela->idnovela)}}" method="post" name="editar" id='reviewEditar'>
+           @csrf
+           @method('patch')
+      <div class="border rounded" style="padding: 10px;"><div id="Autor">{{Auth::user()->name}}</div>
+          <div class="row container" style="margin: 10px;">
+          <input type="hidden" name="idvaloracion" value="{{$puntuacion->where('usuario_idusuario','=',Auth::user()->id)->pluck('idvaloracion')}}">
+          <input type="hidden" name="usuario_nombre_usuario" value="{{Auth::user()->name}}">
+          <input type="hidden" name="idnovela" value="{{$novela->idnovela}}">
+        
+          <input type="hidden" name="idusuario" value="{{Auth::user()->id}}">
+            <textarea name="review" id="area_mensaje2" rows="10">{{$reviews->where('usuario_nombre_usuario', Auth::user()->name)->pluck('review')[0]}}</textarea>
+            </div>
+            <div  style="margin: 20px;">
+            <button class="btn btn-primary " id="botonEnviar"  type="submit">Editar review</button>
+           </form>
+    
+        </div>
+        </div>
+        @endif
+      @endauth
+        </div>
+     
     
   </x-app-layout>
  
 </body>
-
-
-
 
 
 </html>
