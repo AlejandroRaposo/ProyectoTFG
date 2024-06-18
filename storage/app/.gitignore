@@ -1,3 +1,5 @@
-*
-!public/
+prueba.txt
+novelas
+public/novelas
+!public/assets
 !.gitignore

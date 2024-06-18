@@ -1,0 +1,148 @@
+:root {
+   --colorVal: 0; 
+
+}
+.btn-primary{
+color:#0000FF;
+}
+
+body{
+    background-color: #f2f2f2;
+}
+
+.btn-info{
+    color:#EDF8FE;
+}
+
+.btn-danger{
+color:#FF7875;
+}
+#valoracion {
+    animation: cambiarColor linear 2s forwards;
+}
+
+@keyframes cambiarColor {
+    from { background-color:hsl(0,100%,75%)}
+    to{ background-color:hsl(var(--colorVal),100%,75%)}
+}
+
+.redes {
+    max-width: 30px;
+    max-height: 30px;
+    border-radius: 50%;
+    border: black 2px;
+    
+}
+
+.con-com {
+    justify-content: center;
+     margin-bottom:10px;
+    
+}
+
+#fav-borrar :hover{
+    animation: borrarfav linear 2s forwards;
+}
+
+@keyframes borrarFav {
+    from { background-color:hsl(0, 0%, 100%)}
+    to{ background-color:hsl(0, 0%, 64%)}
+    from { color:hsl(0, 100%, 50%)}
+    to{ color:hsl(0, 44%, 32%)}
+
+}
+#fav-add :hover{
+    animation: addfav linear 2s forwards;
+}
+
+@keyframes addFav {
+    from { background-color:hsl(0, 1%, 54%)}
+    to{ background-color:hsl(189, 90%, 76%)}
+    from { color:hsl(0, 0%, 36%)}
+    to{ color:hsl(0, 100%, 50%)}
+
+}
+
+
+#collapseWidth {
+transition:  width .5s ease,height .5 ease !important;
+
+}
+
+
+
+
+
+@media screen and (max-width: 575.98px) {
+    img{
+        margin: auto;
+    }
+    #Ult-novelas-ord {
+        display: none;
+    }
+
+    body{
+        margin: auto;
+        width: auto;
+    }
+
+   .carta-img-novela{
+    img{
+        margin: auto;
+        margin-top: 10px;
+    }
+
+   }
+
+   #contenedor-tabs{
+    grid-area:tabs;
+    width: auto;
+   }
+
+   #panel-usuario{
+    grid-area:usuario;
+    width: auto;
+    div{width: auto;margin: auto;padding: 10px;}
+   }
+
+   #contenedor-usuario{
+    margin-bottom: 10px;
+    grid-template-areas:
+    'usuario'
+    'tabs';
+   }
+
+
+  }
+
+  @media screen and (min-width: 600px) {
+  
+    #MovilCarrusel{
+        display: none;
+    }
+
+    
+   #contenedor-tabs{
+    grid-area:tabs;
+    min-width:auto;
+
+   }
+
+   #panel-usuario{
+    grid-area:usuario;
+    width: auto;
+    max-width: 400px;
+    div{width: auto;margin: auto;padding: 10px;}
+   }
+
+   #contenedor-usuario{
+    margin-bottom: 10px;
+    grid-template-areas:
+    'usuario tabs tabs';
+   }
+
+  }
+
+
+
+
