@@ -10,6 +10,7 @@
 </head>
 
 <body>
+  <?php $pag = 'index';?>
   <x-app-layout>
 
     <div class="contenido container-fluid">

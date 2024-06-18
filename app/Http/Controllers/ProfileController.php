@@ -11,11 +11,14 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\models\User;
 use App\models\Mensaje;
+use App\models\Lista;
 use App\Models\Novela;
 use App\Models\link_red;
 use App\Models\novela_has_genero;
 use App\Models\capitulo;
 use Illuminate\Support\Facades\Gate;
+
+use function PHPUnit\Framework\isNull;
 
 class ProfileController extends Controller
 {
@@ -41,18 +44,18 @@ class ProfileController extends Controller
 
         }
 
+        $listas = Lista::join('lista_has_novelas','listas.idlista','lista_has_novelas.lista_idlista')->where('novela_idnovela',$id)->get();
         $usuario =  User::find($id);
         $redes = link_red::where('usuarioid',$id)->select('usuarioid','facebook','twitter','instagram','discord','paypal','patreon','kofi')->get()[0];
         $mensajes = Mensaje::with('mensajeRecibido')->where("idusuario_objetivo",$id)->paginate(10, ['*'],'mensajes');
         $novelasUsuario = Novela::with('capitulos')->where('usuario_idusuario',$id)->paginate(10 , ['*'],'novelas');
-        $generos = novela_has_genero::with('generos')->whereIn('novela_idnovela', (Novela::where('usuario_idusuario',$id)->pluck('idnovela')))->get();
         $capitulos = capitulo::select('*');
-
+        $generosNov = novela_has_genero::join('generos','novela_has_generos.genero_idgenero','generos.idgenero')->get();
         
         $novelas_cap = novela::join('capitulos','novelas.idnovela', '=' ,'capitulos.novela_idnovela')->join('novela_has_generos','novelas.idnovela','=','novela_has_generos.novela_idnovela')->join('generos','novela_has_generos.genero_idgenero','=','generos.idgenero')->select('nombre_novela','idnovela','edad_min','created_at','fecha_creacion','estado','idcapitulo','nombre_capitulo','link_capitulo','nombre_genero')->orderBy('fecha_creacion', 'desc')->get();
         
 
-        return view('profile.show', compact('usuario','mensajes','novelasUsuario','redes','generos','capitulos','novelas_cap','idnovelaAzar'));
+        return view('profile.show', compact('usuario','mensajes','novelasUsuario','redes','generosNov','capitulos','novelas_cap','idnovelaAzar','listas'));
     }
 
 
@@ -78,6 +81,33 @@ class ProfileController extends Controller
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
+
+        $links = Link_red::where('usuarioid',$request->user()->id);
+
+        if (($_POST['facebook']) != ''){
+            $links->update(['facebook' => $_POST['facebook']]);
+        }
+
+        if (($_POST['twitter']) != ''){
+            $links->update(['twitter' => $_POST['twitter']]);
+        }
+
+        if (($_POST['instagram']) != ''){
+            $links->update(['instagram' => $_POST['instagram']]);
+        }
+
+        if (($_POST['discord']) != ''){
+            $links->update(['discord' => $_POST['discord']]);
+        }
+
+        if (($_POST['patreon']) != ''){
+            $links->update(['patreon' => $_POST['patreon']]);
+        }
+
+        if (($_POST['kofi']) != ''){
+            $links->update(['kofi' => $_POST['kofi']]);
+        }
+
 
         $request->user()->save();
 

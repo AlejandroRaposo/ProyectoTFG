@@ -1,5 +1,7 @@
 <x-app-layout>
+
   <script>
+    
     function editarmensaje(respuesta) {
 
       document.getElementById('area_mensaje').innerHTML = document.getElementById(respuesta).innerHTML;
@@ -45,8 +47,8 @@
     }
   </script>
 
-  <div class="container" id="contenedor-usuario">
-    <div class="row" id="panel-usuario" style="margin:10px;">
+  <div class="row" id="contenedor-usuario" style="justify-content: center;">
+    <div class="col g-0" id="panel-usuario" style="margin:10px;">
 
       <div class="col-2 border rounded" style="padding:10px; height:fit-content;">
         <div>
@@ -89,7 +91,7 @@
         <div class=" con-com border rounded">
 
 
-          @if ((isset($redes->kofi)) || (isset($redes->patreon)) || (isset($redes->paypal)))
+          @if ((isset($redes->kofi)) || (isset($redes->patreon)))
           <div class="row con-com">Donar</div>
           @endif
 
@@ -97,12 +99,6 @@
             @if (isset($redes->patreon))
             <div class="col ">
               <a class="rounded-circle" href="http://patreon.com/{{$redes->patreon}}"><img src="{{ asset('storage/assets/patreon.svg') }}" class="redes mx-auto" alt="icono patreon"></a>
-            </div>
-            @endif
-
-            @if (isset($redes->paypal))
-            <div class="col">
-              <a class="rounded-circle" href="http://paypal.com/{{$redes->paypal}}"><img src="{{ asset('storage/assets/paypal.svg') }}" class="redes mx-auto" alt="icono paypal"></a>
             </div>
             @endif
 

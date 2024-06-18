@@ -135,6 +135,7 @@ quill.setContents(
               document.getElementById('cancelar').type = 'button';
               document.getElementsByName('_method')[document.getElementsByName('_method').length-1].value = "post";
               document.getElementById('id').value = respuesta;
+
               
             }
 
@@ -186,6 +187,9 @@ quill.setContents(
       <input type="hidden" name="idnovela" value="{{$novela->idnovela}}">
       <input type="hidden" id="id" name="idrespuesta" value=0>
       
+      
+
+      
 
         <textarea name="comentario" id="area_mensaje" rows="10"></textarea>
         </div>
@@ -202,6 +206,6 @@ quill.setContents(
   @endauth
     </div>
  
-    
+ 
 
 </x-app-layout>

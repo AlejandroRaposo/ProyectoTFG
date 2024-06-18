@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\View;
 use App\Models\User;
 use App\Models\Novela;
 use App\Models\Capitulo;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -59,6 +61,13 @@ class AppServiceProvider extends ServiceProvider
 
         
     }
+
+    VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+        return (new MailMessage)
+            ->subject('Verifica tu dirección de email')
+            ->line('Pulsa el botón para verificar tu email.')
+            ->action('Verificar', $url);
+    });
 
 }
 }

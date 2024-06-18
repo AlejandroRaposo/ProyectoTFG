@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\models\Link_red;
+use App\models\Lista;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -45,7 +46,11 @@ class RegisteredUserController extends Controller
             'fecha_nacimiento' => $request->fecha,
         ]);
 
-        link_red::insert(['usuarioid' => $request->usuario_idusuario,]);
+        $usuario = User::select('id')->where('email',$request->email)->get()[0];
+
+        link_red::insert(['usuarioid' => $usuario['id']]);
+
+        lista::insert(['usuario_idusuario' => $usuario['id']]);
 
         event(new Registered($user));
 

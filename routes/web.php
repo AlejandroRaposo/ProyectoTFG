@@ -19,11 +19,15 @@ Route::get('/novelas', novelaController::class . '@index')->name('novelas.index'
 
 Route::get('/novela/create', novelaController::class . '@create')->middleware(['auth', 'verified'])->name('novela.create');
 
+Route::get('/novela/{id}/update', novelaController::class . '@updatePage')->middleware(['auth', 'verified'])->name('novela.updatePage');
+
 Route::post('/novelas', novelaController::class . '@store')->middleware(['auth', 'verified'])->name('novela.store');
 
 Route::get('/novela/{id}', novelaController::class . '@show')->name('novela.show');
 
 Route::delete('/novelas/{id}', novelaController::class . '@destroy')->middleware(['auth', 'verified'])->name('novela.destroy');
+
+Route::patch('/novela/{id}/update', novelaController::class . '@update')->middleware(['auth', 'verified'])->name('novela.update');
 
 // Valoraciones
 
@@ -52,15 +56,21 @@ Route::get('/novela/{id}/capitulo/{id2}', novelaController::class . '@lector')->
 
 Route::get('/novela/{id}/create', novelaController::class . '@createCapitulo')->middleware(['auth', 'verified'])->name('capitulo.create');
 
+Route::get('/novela/{id}/capitulo/{id2}/update', novelaController::class . '@updPagCapitulo')->middleware(['auth', 'verified'])->name('capitulos.updPagCapitulo');
+
 Route::post('/novela/{id}/create', novelaController::class . '@storeCapitulo')->middleware(['auth', 'verified'])->name('capitulo.store');
+
+Route::delete('/novela/{id}/capitulo/{id2}/borrarCap', novelaController::class . '@destroyCapitulo')->name('capitulo.destroy');
+
+Route::patch('/novela/{id}/capitulo/{id2}/update', novelaController::class . '@updateCapitulo')->name('capitulo.update');
 
 // Comentarios
 
 Route::post('/novela/{id}/capitulo/{id2}', novelaController::class . '@enviarComentario')->middleware(['auth', 'verified'])->name('comentario.enviar');
 
-Route::delete('/novela/{id}/capitulo/{id2}', novelaController::class . '@borrarComentario')->middleware(['auth', 'verified'])->name('comentario.borrar');
+Route::delete('/novela/{id}/capitulo/{id2}/borrarCom', novelaController::class . '@borrarComentario')->middleware(['auth', 'verified'])->name('comentario.borrar');
 
-Route::patch('/novela/{id}/capitulo/{id2}', novelaController::class . '@editarComentario')->middleware(['auth', 'verified'])->name('comentario.editar');
+Route::patch('/novela/{id}/capitulo/{id2}/updCom', novelaController::class . '@editarComentario')->middleware(['auth', 'verified'])->name('comentario.editar');
 
 // Mensajes
 
@@ -84,5 +94,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
 
 require __DIR__.'/auth.php';

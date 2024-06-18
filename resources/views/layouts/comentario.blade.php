@@ -20,6 +20,13 @@
         <p class="card-text" id="{{$comentario->idcomentario}}">{{ $comentario->comentario }}</p>
         
 
+      
+
+
+
+
+
+
         @auth
         <div class="card-footer row align-items">
         <div class="col">

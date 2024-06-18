@@ -22,7 +22,7 @@
 body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
   </style>
 </head>
-
+<?php $pag = 'showNov';?>
 <body>
 
 
@@ -131,12 +131,14 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
 
                    
                      
-
-                    @if (in_array(Auth::user()->id, $listas->pluck('idlista')->all()))
+<div class="row" style="text-justify: auto;text-align:center;margin: 10px;">
+  <div class="col">
+                    @if (in_array(Auth::user()->id, $listas->where('usuario_idusuario', Auth::user()->id)->pluck('usuario_idusuario')->all()))
 
                     <form action="{{ route('novela.borrar-favorito' , $novela->idnovela )}}" name="favorito" method="post">
                     @csrf
                     @method('delete')
+                    <input type="hidden" name="pagina" value='showNov'>
                     <input type="hidden" name="idnovelaFav" value="{{ $novela->idnovela }}">
                     <input type="hidden" name="idlistaFav" value="{{ Auth::user()->id }}">
                     <button name="borrarFavo" id="fav-borrar"  type="submit"><img src="{{ asset('storage/assets/heart-solid.svg')}}" class="img-fluid rounded-circle" style="min-width:50px;min-height:50px;max-height: 90px;max-width: 90px; padding:10px" alt="..."></button>
@@ -149,6 +151,8 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
                   <form action="{{ route('novela.add-favorito' , $novela->idnovela )}}" name="favorito" method="post">
                     @csrf
                     @method('post')
+                    <input type="hidden" name="pagina" value='showNov'>
+                    
                     <input type="hidden" name="idnovelaFav" value="{{ $novela->idnovela }}">
                     <input type="hidden" name="idlistaFav" value="{{ Auth::user()->id }}">
                     <button type="submit"><img id="fav-add" src="{{ asset('storage/assets/heart-regular.svg')}}" class="img-fluid rounded-start" style="min-width:50px;min-height:50px;max-height: 90px;max-width: 90px; padding:10px" alt="..."></button>
@@ -157,6 +161,13 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
 
                   </form>
                   @endif
+                  </div>
+<div class="col">
+                  @if (Auth::user()->id === $novela->usuario_idusuario)
+                  <a type="button" class="btn btn-primary"  href="{{route('capitulo.create',$novela->idnovela)}}">Crear capitulo</a>
+                  @endif
+                  </div>
+                  </div>
                   </div>
                   @endauth
               </div>
@@ -190,9 +201,9 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
           <h2><strong>Género:</strong></h2>
         </div>
         <div class="row" style="justify-content: center; margin-bottom:10px;">
-          @foreach ($generos as $genero)
+          @foreach ($generosNov->where('novela_idnovela',$novela->idnovela)->pluck('nombre_genero') as $genero)
           <div class="border rounded-pill bg-primary-subtle" style="width: fit-content;width:auto;">
-            <p>{{ $genero->nombre_genero }}</p>
+            <p>{{$generosNov->where('novela_idnovela',$novela->idnovela)->pluck('nombre_genero')[0]}}</p>
           </div>
 
           @endforeach
@@ -223,11 +234,46 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
                 {{ $capitulo->nombre_capitulo }}
               </x-nav-link>
               <p>Creado el {{ $capitulo->fecha_creacion }}</p>
+              @auth
+              <div class="card-footer row align-items bg-white">
+                <p class="d-inline-flex gap-1">
+
+                  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample{{$capitulo->idcapitulo}}" aria-expanded="false" aria-controls="collapseExample">
+                    Acciones
+                  </button>
+                </p>
+                <div class="collapse" id="collapseExample{{$capitulo->idcapitulo}}">
+                  <div class="card card-body">
+                    <div class="row container">
+                      @if (($novela->usuario_idusuario === Auth::user()->id) || (Auth::user()->tipo === 2) || (Auth::user()->tipo === 3))
+                      <div class="col">
+                        
+                      <button class="btn btn-primary" style="height: 35px; margin:auto;  margin-bottom:20px;">
+                          <a type="button"  href="{{route('capitulos.updPagCapitulo', ['id'=>$novela->idnovela, 'id2'=>$capitulo->idcapitulo])}}">Editar</a>
+                        </button>
+                      </div>
+                      <div class="col">
+                        <form action="{{ route('capitulo.destroy' , ['id'=>$novela->idnovela, 'id2'=>$capitulo->idcapitulo])}}" name="borrar" method="post">
+                          @csrf
+                          @method('delete')
+                          <input type="hidden" name="idusuarioForm" value="{{$novela->usuario_idusuario}}">
+                          <input type="hidden" name="usuario_idusuarioForm" value="{{Auth::user()->id}}">
+                          <input type="hidden" name="idnovelaForm" value="{{ $novela->idnovela }}">
+                          <input type="hidden" name="idcapituloForm" value="{{ $capitulo->idcapitulo }}">
+                          <button class="btn btn-danger" type="submit">Borrar</button>
+                        </form>
+                      </div>
+                      @endif
+
+@endauth
             </div>
 
           </td>
+         
 
 
+
+          
         </tr>
         @endforeach
 
@@ -311,10 +357,12 @@ body { --colorVal: {{round($puntuacion->pluck('puntuacion')->avg(),2)*10+10}}}
         </div>
         </div>
         @endif
+
       @endauth
         </div>
      
-    
+       
+
   </x-app-layout>
  
 </body>

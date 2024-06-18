@@ -73,7 +73,7 @@ public function enviarMensaje(string $id, Request $request){
         $mensajes = Mensaje::with('mensajeRecibido')->where("idusuario_objetivo",$id)->paginate(10, ['*'],'mensajes');
         $novelasUsuario = Novela::with('autor')->where('usuario_idusuario',$id)->paginate(10 , ['*'],'novelas');
 
-        return view('profile.show', compact('usuario','mensajes','novelasUsuario',));
+        return redirect()->route('profile.show', $_POST['idusuario_destino']);
 }
 
 
@@ -89,7 +89,7 @@ public function borrarMensaje(string $id,Request $request) {
     $novelasUsuario = Novela::with('autor')->where('usuario_idusuario',$id)->paginate(10 , ['*'],'novelas');
 
 
-    return view('profile.show', compact('usuario','mensajes','novelasUsuario'));
+    return redirect()->route('profile.show', $_POST['idusuario_destino']);
 }
 
 public function editarMensaje(Request $request){
@@ -103,7 +103,7 @@ public function editarMensaje(Request $request){
     $mensajes = Mensaje::with('mensajeRecibido')->where("idusuario_objetivo",$_POST['idusuario_destino'])->paginate(10, ['*'],'mensajes');
     $novelasUsuario = Novela::with('autor')->where('usuario_idusuario',$_POST['idusuario_destino'])->paginate(10 , ['*'],'novelas');
 
-    return view('profile.show', compact('usuario','mensajes','novelasUsuario',));
+    return redirect()->route('profile.show', $_POST['idusuario_destino']);
 }
 
 }
