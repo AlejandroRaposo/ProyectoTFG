@@ -3,19 +3,23 @@
 
 }
 .btn-primary{
-color:#0000FF;
+    --bs-btn-bg: #0000FF;
+    
 }
 
 body{
-    background-color: #f2f2f2;
+    background-color: #FFF6DF;
 }
 
+#editor{
+    background-color: white;
+}
 .btn-info{
-    color:#EDF8FE;
+   --bs-btn-bg:#A8DBFF;
 }
 
 .btn-danger{
-color:#FF7875;
+   --bs-btn-bg:#FF6557;
 }
 #valoracion {
     animation: cambiarColor linear 2s forwards;

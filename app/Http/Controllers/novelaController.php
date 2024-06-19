@@ -39,6 +39,13 @@ class novelaController extends Controller
             $idnovelaAzar = novela::whereNull('edad_min')->pluck('idnovela');
         }
 
+        if (gate::denies('comprobar-edad', Auth::user())) {
+            $lista_novelas = novela::whereNull('edad_min')->paginate(10);
+            $lista_ultimas_novelas = novela::latest('created_at')->whereNull('edad_min')->limit(5)->get();
+            $novelas_cap = novela::join('capitulos', 'novelas.idnovela', '=', 'capitulos.novela_idnovela')->join('novela_has_generos', 'novelas.idnovela', '=', 'novela_has_generos.novela_idnovela')->join('generos', 'novela_has_generos.genero_idgenero', '=', 'generos.idgenero')->select('nombre_novela', 'idnovela', 'edad_min', 'created_at', 'fecha_creacion', 'estado', 'idcapitulo', 'nombre_capitulo', 'link_capitulo', 'nombre_genero')->orderBy('fecha_creacion', 'desc')->whereNull('edad_min')->get();
+            $idnovelaAzar = novela::whereNull('edad_min')->pluck('idnovela');
+        }
+
 
         $listas = Lista::join('lista_has_novelas', 'listas.idlista', 'lista_has_novelas.lista_idlista')->get();
 
